@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gray-50">
+<div class="w-full max-w-md mx-4">
+    <!-- Tarjeta de Login -->
+    <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
+        <!-- Header con gradiente -->
+        <div class="gradient-bg py-6 px-8 text-center">
+            <h1 class="text-2xl font-bold text-white">Bienvenido de nuevo</h1>
+            <p class="text-blue-100 mt-1">Ingresa tus credenciales para continuar</p>
+        </div>
+
+        <!-- Formulario -->
+        <form th:action="@{/login}" method="post" class="p-8 space-y-6">
+            <!-- Campo Email (nombre cambiado a 'username') -->
+            <div class="space-y-1">
+                <label class="block text-sm font-medium text-gray-700">Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-gray-400"></i>
+                    </div>
+                    <input type="email" name="username" placeholder="tu@email.com" required
+                           class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200" />
+                </div>
+            </div>
+
+            <!-- Campo Contraseña -->
+            <div class="space-y-1">
+                <div class="flex justify-between items-center">
+                    <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+                    <a href="#" class="text-xs text-purple-600 hover:text-purple-500">¿Olvidaste tu contraseña?</a>
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input type="password" name="password" placeholder="••••••••" required
+                           class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200" />
+                </div>
+            </div>
+
+            <!-- Recordar sesión -->
+            <div class="flex items-center">
+                <input id="remember" name="remember" type="checkbox"
+                       class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded" />
+                <label for="remember" class="ml-2 block text-sm text-gray-700">Recordar mi sesión</label>
+            </div>
+
+            <!-- Botón de Login -->
+            <button type="submit"
+                    class="w-full gradient-bg text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-200 shadow-md">
+                <i class="fas fa-sign-in-alt mr-2"></i> Iniciar Sesión
+            </button>
+
+            <!-- Enlace a Registro -->
+            <div class="text-center pt-4">
+                <p class="text-sm text-gray-600">
+                    ¿No tienes una cuenta?
+                    <a th:href="@{/registro}" class="font-medium text-purple-600 hover:text-purple-500">Regístrate aquí</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-6 text-center text-xs text-gray-500">
+        <p>© 2023 Tu Aplicación. Todos los derechos reservados.</p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Asignar Horario</title>
+</head>
+<body>
+<h2>Asignar Nueva Clase</h2>
+<form th:action="@{/admin/horarios/asignar}" th:object="${horario}" method="post">
+    <div>
+        <label>Asignatura:</label>
+        <select th:field="*{asignatura.idAsignatura}">
+            <!-- Opciones cargadas desde el controlador -->
+        </select>
+    </div>
+    <div>
+        <label>Docente:</label>
+        <select th:field="*{docente.idDocente}">
+            <!-- Opciones cargadas desde el controlador -->
+        </select>
+    </div>
+    <button type="submit">Asignar</button>
+</form>
+</body>
+</html>
