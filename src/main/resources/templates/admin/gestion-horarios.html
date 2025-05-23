@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Horarios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .content {
+            margin-left: 280px;
+        }
+        .nav-item {
+            transition: all 0.2s;
+        }
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .badge-primary {
+            background-color: #e0e7ff;
+            color: #4338ca;
+        }
+        .badge-secondary {
+            background-color: #ecfdf5;
+            color: #047857;
+        }
+        .badge-tertiary {
+            background-color: #f0f9ff;
+            color: #0369a1;
+        }
+        .action-btn {
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+        .day-chip {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .day-monday { background-color: #f3e8ff; color: #7e22ce; }
+        .day-tuesday { background-color: #e0f2fe; color: #0369a1; }
+        .day-wednesday { background-color: #ecfccb; color: #3f6212; }
+        .day-thursday { background-color: #ffedd5; color: #9a3412; }
+        .day-friday { background-color: #fce7f3; color: #9d174d; }
+        .day-saturday { background-color: #f1f5f9; color: #334155; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex">
+<!-- Sidebar -->
+<aside class="sidebar text-white fixed h-full z-40 shadow-xl">
+    <div class="p-6 h-full flex flex-col">
+        <!-- Logo -->
+        <div class="text-xl font-bold py-4 flex items-center">
+            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
+                <i class="gradient-text fas fa-user-shield"></i>
+            </div>
+            <span>Admin Panel</span>
+        </div>
+
+        <!-- Menú -->
+        <nav class="flex-1 py-6">
+            <ul class="space-y-2">
+                <li>
+                    <a href="/admin/dashboard" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-users-cog mr-3 text-blue-200"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/usuarios" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-users-cog mr-3 text-blue-200"></i>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/programas" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-graduation-cap mr-3 text-blue-200"></i>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/asignaturas" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-book mr-3 text-blue-200"></i>
+                        <span>Gestionar Asignaturas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/horarios" class="nav-item flex items-center px-4 py-3 bg-white bg-opacity-10 rounded-lg font-medium">
+                        <i class="fas fa-calendar-alt mr-3 text-white"></i>
+                        <span>Gestion de Horarios</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Perfil -->
+        <div class="mt-auto pt-6 border-t border-blue-400 border-opacity-30">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <img class="h-10 w-10 rounded-full border-2 border-white" src="https://ui-avatars.com/api/?name=A&background=7c3aed&color=fff" alt="Admin">
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium" th:text="${email}">admin@example.com</p>
+                    <p class="text-xs text-blue-200">Administrador</p>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="mt-3">
+                <button type="submit" class="nav-item w-full flex items-center px-4 py-2 rounded-lg text-sm text-left">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- Contenido principal -->
+<div class="content flex-1">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <h1 class="text-xl font-semibold text-gray-800">
+                    <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
+                    Gestión de Horarios
+                </h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full text-gray-400 hover:text-purple-600 hover:bg-purple-50">
+                    <i class="fas fa-bell"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido -->
+    <main class="max-w-7xl mx-auto px-6 py-6">
+        <!-- Filtros -->
+        <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+            <form th:action="@{/admin/horarios}" method="get" class="flex flex-col md:flex-row gap-4">
+                <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" name="busqueda" placeholder="Buscar horarios..." class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                </div>
+                <select name="docente" class="bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                    <option value="">Todos los docentes</option>
+                    <option th:each="docente : ${docentes}" th:value="${docente.idDocente}" th:text="${docente.nombre + ' ' + docente.apellido}"></option>
+                </select>
+                <select name="asignatura" class="bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                    <option value="">Todas las asignaturas</option>
+                    <option th:each="asignatura : ${asignaturas}" th:value="${asignatura.idAsignatura}" th:text="${asignatura.nombre}"></option>
+                </select>
+                <button type="submit" class="gradient-bg text-white py-2 px-4 rounded-lg text-sm font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-200 action-btn">
+                    <i class="fas fa-filter mr-1"></i> Filtrar
+                </button>
+            </form>
+        </div>
+
+        <!-- Lista de Horarios -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-clock text-purple-500 mr-2"></i>
+                    Horarios Registrados
+                    <span class="ml-2 text-sm font-normal text-gray-500" th:text="'(' + ${horarios.size()} + ')'"></span>
+                </h2>
+                <a href="/admin/horarios/nuevo" class="gradient-bg text-white py-2 px-4 rounded-lg text-sm font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-200 action-btn">
+                    <i class="fas fa-plus mr-1"></i> Nuevo Horario
+                </a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asignatura</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Docente</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aula</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Día</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horario</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="horario,iter : ${horarios}" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${iter.index + 1}"></td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900" th:text="${horario.asignatura.nombre}"></div>
+                                    <div class="text-sm text-gray-500" th:text="${horario.asignatura.codigo}"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900" th:text="${horario.docente.nombre + ' ' + horario.docente.apellido}"></div>
+                            <div class="text-sm text-gray-500" th:text="${horario.docente.especialidad}"></div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full badge-primary" th:text="${horario.aula.numero}"></span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                                    <span th:switch="${horario.diaSemana}" class="day-chip">
+                                        <span th:case="'Lunes'" class="day-monday">Lunes</span>
+                                        <span th:case="'Martes'" class="day-tuesday">Martes</span>
+                                        <span th:case="'Miércoles'" class="day-wednesday">Miércoles</span>
+                                        <span th:case="'Jueves'" class="day-thursday">Jueves</span>
+                                        <span th:case="'Viernes'" class="day-friday">Viernes</span>
+                                        <span th:case="'Sábado'" class="day-saturday">Sábado</span>
+                                    </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900" th:text="${horario.turno.nombre}"></div>
+                            <div class="text-sm text-gray-500" th:text="${horario.turno.horaInicio + ' - ' + horario.turno.horaFin}"></div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <a th:href="@{'/admin/horarios/editar/' + ${horario.idHorario}}" class="text-blue-600 hover:text-blue-900 action-btn">
+                                    <i class="fas fa-edit mr-1"></i> Editar
+                                </a>
+                                <form th:action="@{'/admin/horarios/eliminar/' + ${horario.idHorario}}" method="post">
+                                    <button type="submit" class="text-red-600 hover:text-red-900 action-btn">
+                                        <i class="fas fa-trash-alt mr-1"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${horarios.isEmpty()}">
+                        <td colspan="7" class="px-6 py-4 text-center">
+                            <div class="text-gray-400">
+                                <i class="fas fa-calendar-times text-4xl mb-3"></i>
+                                <p class="font-medium">No hay horarios registrados</p>
+                                <p class="text-sm mt-1">Crea un nuevo horario para comenzar</p>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Paginación -->
+            <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                <div class="text-sm text-gray-500">
+                    Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">24</span> resultados
+                </div>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Anterior
+                    </button>
+                    <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

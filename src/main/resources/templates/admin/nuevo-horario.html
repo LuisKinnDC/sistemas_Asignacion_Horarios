@@ -1,0 +1,39 @@
+<form th:action="@{/admin/horarios/asignar}" method="post" class="space-y-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Asignatura</label>
+        <select name="idAsignatura" class="mt-1 block w-full bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+            <option th:each="asignatura : ${asignaturas}" th:value="${asignatura.idAsignatura}" th:text="${asignatura.nombre}"></option>
+        </select>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Docente</label>
+        <select name="idDocente" class="mt-1 block w-full bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+            <option th:each="docente : ${docentes}" th:value="${docente.idDocente}" th:text="${docente.nombre + ' ' + docente.apellido}"></option>
+        </select>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Aula</label>
+        <select name="idAula" class="mt-1 block w-full bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+            <option th:each="aula : ${aulas}" th:value="${aula.idAula}" th:text="${aula.numero}"></option>
+        </select>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Día de la Semana</label>
+        <select name="diaSemana" class="mt-1 block w-full bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+        </select>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Turno</label>
+        <select name="idTurno" class="mt-1 block w-full bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+            <option th:each="turno : ${turnos}" th:value="${turno.idTurno}" th:text="${turno.nombre}"></option>
+        </select>
+    </div>
+    <button type="submit" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition duration-200">
+        <i class="fas fa-save mr-1"></i> Guardar
+    </button>
+</form>

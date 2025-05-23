@@ -106,4 +106,8 @@ public class UsuarioService {
         return usuarioRepository.findByAprobadoAndActivo(false, false);
     }
 
+    public long contarUsuarios() {
+        return usuarioRepository.count();
+    }
+
 }
