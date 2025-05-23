@@ -1,15 +1,13 @@
 package com.sistema.asig_horarios.controller;
 
 import com.sistema.asig_horarios.model.Usuario;
+import com.sistema.asig_horarios.repository.UsuarioRepository;
 import com.sistema.asig_horarios.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,18 +18,50 @@ public class AdminController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @GetMapping("/dashboard")
-    public String adminDashboard(Model model) {
-        // Usuarios pendientes de aprobación
-        List<Usuario> usuariosPendientes = usuarioService.obtenerUsuariosPendientes();
-        model.addAttribute("usuariosPendientes", usuariosPendientes);
+    // Gestionar Usuarios
+    @GetMapping("/usuarios")
+    public String gestionarUsuarios(Model model) {
 
-        return "admin/dashboard";
+        // Obtener usuarios pendientes de activación
+        List<Usuario> usuariosPendientesActivacion = usuarioService.listarUsuariosPendientesActivacion();
+        model.addAttribute("usuariosPendientesActivacion", usuariosPendientesActivacion);
+
+        // Obtener todos los usuarios aprobados y activos
+        List<Usuario> usuariosAprobadosActivos = usuarioService.listarUsuariosAprobadosActivos();
+        model.addAttribute("usuariosAprobadosActivos", usuariosAprobadosActivos);
+
+        // Obtener usuarios rechazados
+        List<Usuario> usuariosRechazados = usuarioService.listarUsuariosRechazados();
+        model.addAttribute("usuariosRechazados", usuariosRechazados);
+
+        return "admin/gestion-usuarios"; // Vista específica para gestionar usuarios
     }
 
-    @PostMapping("/aprobar")
-    public String aprobarUsuario(@RequestParam Integer idUsuario) {
-        usuarioService.aprobarUsuario(idUsuario);
-        return "redirect:/admin/dashboard";
+    // Activar un usuario
+    @PostMapping("/activar")
+    public String activarUsuario(@RequestParam Integer idUsuario) {
+        usuarioService.activarUsuario(idUsuario);
+        return "redirect:/admin/usuarios";
+    }
+
+    // Rechazar un usuario
+    @PostMapping("/rechazar")
+    public String rechazarUsuario(@RequestParam Integer idUsuario) {
+        usuarioService.rechazarUsuario(idUsuario);
+        return "redirect:/admin/usuarios";
+    }
+
+    // Cambiar estado de un usuario (alternar entre activo/inactivo)
+    @PostMapping("/usuarios/cambiar-estado/{idUsuario}")
+    public String cambiarEstadoUsuario(@PathVariable Integer idUsuario) {
+        usuarioService.cambiarEstadoUsuario(idUsuario);
+        return "redirect:/admin/usuarios";
+    }
+
+    // Eliminar un usuario rechazado
+    @PostMapping("/eliminar-rechazado")
+    public String eliminarRechazado(@RequestParam Integer idUsuario) {
+        usuarioService.eliminarUsuario(idUsuario);
+        return "redirect:/admin/usuarios";
     }
 }

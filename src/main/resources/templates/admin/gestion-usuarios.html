@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Usuarios</title>
+    <script src="https://cdn.tailwindcss.com "></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css ">
+    <style>
+        /* Estilos generales */
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .content {
+            margin-left: 280px;
+        }
+        .nav-item {
+            transition: all 0.2s;
+        }
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .badge-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .badge-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .badge-inactive {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        .badge-admin {
+            background-color: #e0e7ff;
+            color: #4338ca;
+        }
+        .badge-teacher {
+            background-color: #ecfdf5;
+            color: #047857;
+        }
+        .badge-student {
+            background-color: #f0f9ff;
+            color: #0369a1;
+        }
+        .action-btn {
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .status-active {
+            background-color: #10b981;
+        }
+        .status-inactive {
+            background-color: #ef4444;
+        }
+        .status-pending {
+            background-color: #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex">
+<!-- Sidebar -->
+<aside class="sidebar text-white fixed h-full z-40 shadow-xl">
+    <div class="p-6 h-full flex flex-col">
+        <!-- Logo -->
+        <div class="text-xl font-bold py-4 flex items-center">
+            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
+                <i class="gradient-text fas fa-user-shield"></i>
+            </div>
+            <span>Admin Panel</span>
+        </div>
+        <!-- Menú -->
+        <nav class="flex-1 py-6">
+            <ul class="space-y-2">
+                <li>
+                    <a href="/admin/dashboard" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-tachometer-alt mr-3 text-blue-200"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/usuarios" class="nav-item flex items-center px-4 py-3 bg-white bg-opacity-10 rounded-lg font-medium">
+                        <i class="fas fa-users-cog mr-3 text-white"></i>
+                        <span>Gestión de Usuarios</span>
+                        <span th:if="${usuariosPendientesActivacion.size() > 0}" class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full" th:text="${usuariosPendientesActivacion.size()}"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/programas" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-graduation-cap mr-3 text-blue-200"></i>
+                        <span>Programas Académicos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/asignaturas" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-book mr-3 text-blue-200"></i>
+                        <span>Asignaturas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/horarios" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-calendar-alt mr-3 text-blue-200"></i>
+                        <span>Horarios</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- Perfil -->
+        <div class="mt-auto pt-6 border-t border-blue-400 border-opacity-30">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <img class="h-10 w-10 rounded-full border-2 border-white" src="https://ui-avatars.com/api/?name=A&background=7c3aed&color=fff " alt="Admin">
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium" th:text="${email}">admin@example.com</p>
+                    <p class="text-xs text-blue-200">Administrador</p>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="mt-3">
+                <button type="submit" class="nav-item w-full flex items-center px-4 py-2 rounded-lg text-sm text-left">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+<!-- Contenido principal -->
+<div class="content flex-1">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <h1 class="text-xl font-semibold text-gray-800">
+                    <i class="fas fa-users-cog text-purple-500 mr-2"></i>
+                    Gestión de Usuarios
+                </h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="gradient-bg text-white py-2 px-4 rounded-lg text-sm font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-200 action-btn">
+                    <i class="fas fa-plus mr-2"></i> Nuevo Usuario
+                </button>
+                <button class="p-2 rounded-full text-gray-400 hover:text-purple-600 hover:bg-purple-50">
+                    <i class="fas fa-bell"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- Contenido -->
+    <main class="max-w-7xl mx-auto px-6 py-6">
+        <!-- Filtros y búsqueda -->
+        <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Buscar usuarios...">
+                </div>
+                <div class="flex space-x-2">
+                    <select class="bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                        <option>Filtrar por rol</option>
+                        <option>Administrador</option>
+                        <option>Docente</option>
+                        <option>Estudiante</option>
+                    </select>
+                    <select class="bg-gray-50 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                        <option>Filtrar por estado</option>
+                        <option>Activos</option>
+                        <option>Inactivos</option>
+                        <option>Pendientes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- Usuarios Pendientes de Activación -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+            <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-user-clock text-yellow-500 mr-2"></i>
+                    Usuarios Pendientes de Activación
+                    <span class="ml-2 text-sm font-normal text-gray-500" th:text="'(' + ${usuariosPendientesActivacion.size()} + ')'"></span>
+                </h2>
+                <button class="text-sm text-purple-600 hover:text-purple-800 font-medium">
+                    <i class="fas fa-sync-alt mr-1"></i> Actualizar
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol Solicitado</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Registro</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="usuario,iter : ${usuariosPendientesActivacion}" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${iter.index + 1}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900" th:text="${usuario.email}"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span th:switch="${usuario.rol}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                                <span th:case="'ADMIN'" class="badge-admin">Administrador</span>
+                                <span th:case="'DOCENTE'" class="badge-teacher">Docente</span>
+                                <span th:case="'ESTUDIANTE'" class="badge-student">Estudiante</span>
+                                <span th:case="null" class="text-gray-500">Sin Rol</span>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="status-dot status-pending"></span>
+                            <span class="text-sm text-gray-500">Pendiente</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(usuario.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <form th:action="@{/admin/activar}" method="post">
+                                    <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
+                                    <button type="submit" class="text-green-600 hover:text-green-900 action-btn">
+                                        <i class="fas fa-check-circle mr-1"></i> Activar
+                                    </button>
+                                </form>
+                                <form th:action="@{/admin/rechazar}" method="post">
+                                    <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
+                                    <button type="submit" class="text-red-600 hover:text-red-900 action-btn">
+                                        <i class="fas fa-times-circle mr-1"></i> Rechazar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${usuariosPendientesActivacion.isEmpty()}">
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No hay usuarios pendientes de activación
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Todos los Usuarios Registrados -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-users text-purple-500 mr-2"></i>
+                    Todos los Usuarios Registrados
+                    <span class="ml-2 text-sm font-normal text-gray-500" th:text="'(' + ${usuariosAprobadosActivos.size()} + ')'"></span>
+                </h2>
+                <div class="flex items-center space-x-2">
+                    <button class="text-sm text-purple-600 hover:text-purple-800 font-medium">
+                        <i class="fas fa-file-export mr-1"></i> Exportar
+                    </button>
+                    <button class="text-sm text-purple-600 hover:text-purple-800 font-medium">
+                        <i class="fas fa-sync-alt mr-1"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registro</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="usuario,iter : ${usuariosAprobadosActivos}" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${iter.index + 1}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900" th:text="${usuario.email}"></div>
+                                    <div class="text-sm text-gray-500" th:text="'ID: ' + ${usuario.idUsuario}"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span th:switch="${usuario.rol}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                                <span th:case="'ADMIN'" class="badge-admin">Administrador</span>
+                                <span th:case="'DOCENTE'" class="badge-teacher">Docente</span>
+                                <span th:case="'ESTUDIANTE'" class="badge-student">Estudiante</span>
+                                <span th:case="null" class="text-gray-500">Sin Rol</span>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span th:if="${usuario.activo}" class="status-dot status-active"></span>
+                            <span th:unless="${usuario.activo}" class="status-dot status-inactive"></span>
+                            <span th:text="${usuario.activo ? 'Activo' : 'Inactivo'}" class="text-sm"></span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(usuario.fechaRegistro, 'dd/MM/yyyy')}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-3">
+                                <a th:href="@{'/admin/usuarios/editar/' + ${usuario.idUsuario}}" class="text-blue-600 hover:text-blue-900 action-btn">
+                                    <i class="fas fa-edit mr-1"></i> Editar
+                                </a>
+                                <form th:action="@{'/admin/usuarios/cambiar-estado/' + ${usuario.idUsuario}}" method="post">
+                                    <button type="submit" class="text-indigo-600 hover:text-indigo-900 action-btn">
+                                        <i class="fas fa-power-off mr-1"></i>
+                                        <span th:text="${usuario.activo} ? 'Desactivar' : 'Activar'"></span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Paginación -->
+            <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                <div class="text-sm text-gray-500">
+                    Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">24</span> resultados
+                </div>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Anterior
+                    </button>
+                    <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Usuarios Rechazados -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+            <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-user-slash text-red-500 mr-2"></i>
+                    Usuarios Rechazados
+                    <span class="ml-2 text-sm font-normal text-gray-500" th:text="'(' + ${usuariosRechazados.size()} + ')'"></span>
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol Solicitado</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="usuario,iter : ${usuariosRechazados}" class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${iter.index + 1}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900" th:text="${usuario.email}"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span th:switch="${usuario.rol}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                                <span th:case="'ADMIN'" class="badge-admin">Administrador</span>
+                                <span th:case="'DOCENTE'" class="badge-teacher">Docente</span>
+                                <span th:case="'ESTUDIANTE'" class="badge-student">Estudiante</span>
+                                <span th:case="null" class="text-gray-500">Sin Rol</span>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <form th:action="@{/admin/eliminar-rechazado}" method="post">
+                                <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
+                                <button type="submit" class="text-red-600 hover:text-red-900 action-btn">
+                                    <i class="fas fa-trash-alt mr-1"></i> Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${usuariosRechazados.isEmpty()}">
+                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No hay usuarios rechazados
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -18,6 +18,7 @@ public class DashboardController {
         String role = authentication.getAuthorities().iterator().next().getAuthority();
         model.addAttribute("role", role);
 
+
         // Personalizar vista según el rol
         if (role.equals("ROLE_ADMIN")) {
             return "admin/dashboard";

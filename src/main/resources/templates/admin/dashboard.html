@@ -1,22 +1,234 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Administrador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+            transition: all 0.3s;
+        }
+        .content {
+            margin-left: 280px;
+            transition: all 0.3s;
+        }
+        .nav-item {
+            transition: all 0.2s;
+        }
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body>
-<h2>Panel de Administrador</h2>
-<p>Bienvenido, <span th:text="${email}"></span></p>
+<body class="bg-gray-50 min-h-screen flex">
+<!-- Sidebar -->
+<aside class="sidebar text-white fixed h-full z-40 shadow-xl">
+    <div class="p-6 h-full flex flex-col">
+        <!-- Logo -->
+        <div class="text-xl font-bold py-4 flex items-center">
+            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
+                <i class="gradient-text fas fa-user-shield"></i>
+            </div>
+            <span>Admin Panel</span>
+        </div>
 
-<h3>Opciones de Administración:</h3>
-<ul>
-    <li><a href="/admin/usuarios">Gestionar Usuarios</a></li>
-    <li><a href="/admin/programas">Gestionar Programas</a></li>
-    <li><a href="/admin/asignaturas">Gestionar Asignaturas</a></li>
-    <li><a href="/admin/horarios">Gestionar Horarios</a></li>
-</ul>
+        <!-- Menú -->
+        <nav class="flex-1 py-6">
+            <ul class="space-y-2">
+                <li>
+                    <a href="/admin/dashboard" class="nav-item flex items-center px-4 py-3 bg-white bg-opacity-10 rounded-lg font-medium">
+                        <i class="fas fa-tachometer-alt mr-3 text-white"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/usuarios" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-users-cog mr-3 text-blue-200"></i>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/programas" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-graduation-cap mr-3 text-blue-200"></i>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/asignaturas" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-book mr-3 text-blue-200"></i>
+                        <span>Gestionar Asignaturas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/horarios" class="nav-item flex items-center px-4 py-3 rounded-lg">
+                        <i class="fas fa-calendar-alt mr-3 text-blue-200"></i>
+                        <span>Gestionar Horarios</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-<form th:action="@{/logout}" method="post">
-    <button type="submit">Cerrar Sesión</button>
-</form>
+        <!-- Perfil -->
+        <div class="mt-auto pt-6 border-t border-blue-400 border-opacity-30">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <img class="h-10 w-10 rounded-full border-2 border-white" src="https://ui-avatars.com/api/?name=A&background=7c3aed&color=fff" alt="Admin">
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium" th:text="${email}">admin@example.com</p>
+                    <p class="text-xs text-blue-200">Administrador</p>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="mt-3">
+                <button type="submit" class="nav-item w-full flex items-center px-4 py-2 rounded-lg text-sm text-left">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- Contenido principal -->
+<div class="content flex-1">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-semibold text-gray-800">
+                <i class="fas fa-tachometer-alt text-purple-500 mr-2"></i>
+                Panel de Administrador
+            </h1>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full text-gray-400 hover:text-purple-600 hover:bg-purple-50">
+                    <i class="fas fa-bell"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido -->
+    <main class="max-w-7xl mx-auto px-6 py-6">
+        <!-- Bienvenida -->
+        <div class="gradient-bg text-white rounded-xl p-6 mb-6 shadow-lg">
+            <h2 class="text-2xl font-bold mb-2">¡Bienvenido, <span th:text="${email}"></span>!</h2>
+            <p class="opacity-90">Panel de control administrativo del sistema</p>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <!-- Card Usuarios -->
+            <div class="card bg-white rounded-xl p-6 shadow-md border-l-4 border-purple-500">
+                <div class="flex items-center mb-4">
+                    <div class="gradient-bg text-white p-3 rounded-lg mr-4">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">Usuarios</h3>
+                </div>
+                <p class="text-gray-600 mb-2">Total registrados</p>
+                <p class="text-3xl font-bold gradient-text">245</p>
+                <a href="/admin/usuarios" class="mt-4 inline-flex items-center text-sm text-purple-600 hover:text-purple-800">
+                    Ver todos <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Card Programas -->
+            <div class="card bg-white rounded-xl p-6 shadow-md border-l-4 border-blue-500">
+                <div class="flex items-center mb-4">
+                    <div class="bg-blue-100 text-blue-600 p-3 rounded-lg mr-4">
+                        <i class="fas fa-graduation-cap text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">Programas</h3>
+                </div>
+                <p class="text-gray-600 mb-2">Programas académicos</p>
+                <p class="text-3xl font-bold text-blue-600">12</p>
+                <a href="/admin/programas" class="mt-4 inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
+                    Gestionar <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Card Asignaturas -->
+            <div class="card bg-white rounded-xl p-6 shadow-md border-l-4 border-green-500">
+                <div class="flex items-center mb-4">
+                    <div class="bg-green-100 text-green-600 p-3 rounded-lg mr-4">
+                        <i class="fas fa-book text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">Asignaturas</h3>
+                </div>
+                <p class="text-gray-600 mb-2">Total en el sistema</p>
+                <p class="text-3xl font-bold text-green-600">84</p>
+                <a href="/admin/asignaturas" class="mt-4 inline-flex items-center text-sm text-green-600 hover:text-green-800">
+                    Ver todas <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Card Horarios -->
+            <div class="card bg-white rounded-xl p-6 shadow-md border-l-4 border-yellow-500">
+                <div class="flex items-center mb-4">
+                    <div class="bg-yellow-100 text-yellow-600 p-3 rounded-lg mr-4">
+                        <i class="fas fa-calendar-alt text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">Horarios</h3>
+                </div>
+                <p class="text-gray-600 mb-2">Horarios activos</p>
+                <p class="text-3xl font-bold text-yellow-600">36</p>
+                <a href="/admin/horarios" class="mt-4 inline-flex items-center text-sm text-yellow-600 hover:text-yellow-800">
+                    Gestionar <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="border-b border-gray-200 px-6 py-4">
+                <h2 class="text-lg font-semibold text-gray-800">Acciones Rápidas</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-6">
+                <a href="/admin/usuarios/nuevo" class="group flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-purple-50 transition duration-150">
+                    <div class="gradient-bg text-white p-3 rounded-full mb-3 group-hover:shadow-lg">
+                        <i class="fas fa-user-plus text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">Nuevo Usuario</span>
+                </a>
+                <a href="/admin/programas/nuevo" class="group flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 transition duration-150">
+                    <div class="bg-blue-100 text-blue-600 p-3 rounded-full mb-3 group-hover:shadow-lg">
+                        <i class="fas fa-plus-circle text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">Nuevo Programa</span>
+                </a>
+                <a href="/admin/asignaturas/nuevo" class="group flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-green-50 transition duration-150">
+                    <div class="bg-green-100 text-green-600 p-3 rounded-full mb-3 group-hover:shadow-lg">
+                        <i class="fas fa-book-medical text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">Nueva Asignatura</span>
+                </a>
+                <a href="/admin/horarios/generar" class="group flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-yellow-50 transition duration-150">
+                    <div class="bg-yellow-100 text-yellow-600 p-3 rounded-full mb-3 group-hover:shadow-lg">
+                        <i class="fas fa-calendar-plus text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">Generar Horarios</span>
+                </a>
+            </div>
+        </div>
+    </main>
+</div>
 </body>
 </html>

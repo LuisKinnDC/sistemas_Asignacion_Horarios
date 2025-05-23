@@ -27,8 +27,10 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
-    private boolean activo = true;
-    private boolean aprobado = false;
+    @Column(nullable = false)
+    private boolean activo;
+    @Column(nullable = false)
+    private boolean aprobado;
 
     private LocalDateTime fechaRegistro = LocalDateTime.now();
 
