@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard Docente</title>
+</head>
+<body>
+<h2>Panel de Docente</h2>
+<p>Bienvenido, <span th:text="${email}"></span></p>
+
+<h3>Mis Clases:</h3>
+<ul>
+    <li>Matemáticas I - Lunes M1</li>
+    <li>Introducción a la Programación - Martes M2</li>
+</ul>
+
+<form th:action="@{/logout}" method="post">
+    <button type="submit">Cerrar Sesión</button>
+</form>
+</body>
+</html>
