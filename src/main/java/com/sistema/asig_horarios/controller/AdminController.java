@@ -5,6 +5,9 @@ import com.sistema.asig_horarios.repository.UsuarioRepository;
 import com.sistema.asig_horarios.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +20,24 @@ public class AdminController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+
+    @GetMapping("/dashboard")
+    public String mostrarDashboardAdmin(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String nombreUsuario;
+
+        if (auth != null && auth.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) auth.getPrincipal();
+            nombreUsuario = userDetails.getUsername(); // o cualquier otro dato personalizado
+        } else {
+            nombreUsuario = "Invitado";
+        }
+
+        model.addAttribute("nombreUsuario", nombreUsuario);
+
+        return "admin/dashboard";
+    }
 
     // Gestionar Usuarios
     @GetMapping("/usuarios")
